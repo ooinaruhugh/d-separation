@@ -12,12 +12,12 @@ using Vertex = int;
 using Edge = pair<Vertex,Vertex>;
 using AdjacencyList = map<Vertex,set<Vertex>>;
 
-void printVertexSet(set<Vertex> V) {
+void printVertexSet(const set<Vertex> V) {
     for (auto v : V) cout << v << " ";
     cout << endl;
 }
 
-void printEdgeSet(set<Edge> E) {
+void printEdgeSet(const set<Edge> E) {
     for (auto [s,t] : E) 
         cout << s << " -> " << t << ", ";
     cout << endl;
@@ -36,7 +36,7 @@ struct Digraph {
         }
     }
 
-    set<Vertex> V() {
+    set<Vertex> V() const {
         auto kv = views::keys(E);
         return set<Vertex>{ kv.begin(), kv.end() };
     }
@@ -49,31 +49,31 @@ struct Digraph {
         E[s].insert(t);
     }
 
-    set<Edge> outgoingEdges(Vertex v) {
+    set<Edge> outgoingEdges(Vertex v) const {
         set<Edge> output;
-        for (Vertex u : E[v]) {
+        for (Vertex u : E.at(v)) {
             output.emplace(v, u);
         }
 
         return output;
     }
 
-    map<Vertex, set<Vertex>> inLists() {
+    map<Vertex, set<Vertex>> inLists() const {
         map<Vertex, set<Vertex>> output;
         for (auto v : V()) output[v];
 
         for (auto s : V()) {
-            for (auto t : E[s]) 
-                E[t].emplace(s);
+            for (auto t : E.at(s)) 
+                output[t].emplace(s);
         }
 
         return output;
     }
 
-    void printAdjacencyList() {
+    void printAdjacencyList() const {
         for (auto s :V()) {
             cout << s << " -> ";
-            for (auto t : E[s]) 
+            for (auto t : E.at(s)) 
                 cout << t << " ";
             cout << endl;
         }
@@ -138,7 +138,7 @@ set<Vertex> dSeparation (
     Digraph D,
     set<Vertex> J,
     set<Vertex> L
-) {
+) {    
     // 1. Construct the table `descendent`.
     auto inLists = D.inLists();
     set<Vertex> descendent;
@@ -159,19 +159,25 @@ set<Vertex> dSeparation (
     // 3a. Construct the illegal list of edges.
     set<pair<Edge, Edge>> illegal_edges;
     for (auto s : D.V()) {
-        for (auto t : D.E[s]) {
+        for (auto t : D.V()) {
             illegal_edges.emplace(Edge{s,t}, Edge{t,s});
+        }
+    }
 
+    for (auto s : D.V()) {
+        for (auto t : D.E[s]) {
             // Non-colliders
             for (auto u : D.E[t]) {
-                if (L.contains(t)) {
+                if (descendent.contains(t)) {
                     illegal_edges.emplace(Edge{s,t}, Edge{t,u});
+                    cout << "Add " << s << " -> " << t << " -> " << u << endl;
                 }
             }
             // Colliders
             for (auto u : inLists[t]) {
-                if (!L.contains(t)) {
+                if (!descendent.contains(t)) {
                     illegal_edges.emplace(Edge{s,t}, Edge{t,u});
+                    cout << "Add " << s << " -> " << t << " <- " << u << endl;
                 }
             }
         }
@@ -203,7 +209,8 @@ int main() {
     D.addEdge(3,5);
 
     printVertexSet(restrictedBFS(D, set<pair<Edge, Edge>>(), set<Vertex>{1}));
-    printVertexSet(dSeparation(D, {1}, {4}));
+    cout << "----" << endl;   
+    printVertexSet(dSeparation(D, {1}, {4,5}));
 
     return 0;
 }
