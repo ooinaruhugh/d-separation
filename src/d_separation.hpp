@@ -4,12 +4,6 @@
 
 #include <iostream>
 
-std::set<Vertex> restrictedBFS(
-    const Digraph &D,
-    const std::set<std::pair<Edge, Edge>> &illegal_edges,
-    const std::set<Vertex> &J
-);
-
 std::set<Vertex> dSeparation (
     const Digraph &D,
     const std::set<Vertex> &J,
@@ -22,7 +16,7 @@ inline void prettyPrint(
     const VertexSet& K,
     const VertexSet& L
 ) {
-    out << "J={" << J << "} is d-separated from K={" << K << "} by L={" << L << "}" << std::endl;
+    out << "{" << J << "} _||_ {" << K << "} | {" << L << "}" << std::endl;
 }
 
 inline void compactPrettyPrint(
@@ -31,7 +25,7 @@ inline void compactPrettyPrint(
     const VertexSet& K,
     const VertexSet& L
 ) {
-    out << "{" << J << "} _||_ {" << K << "} | {" << L << "}" << std::endl;
+    out << "{{" << J << "}, {" << K << "}, {" << L << "}}" << std::endl;
 }
 
 
