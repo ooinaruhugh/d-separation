@@ -28,7 +28,7 @@ int main() {
     // printVertexSet(restrictedBFS(D, set<pair<Edge, Edge>>(), set<Vertex>{1}));
     // cout << "----" << endl;
 
-    // Hacky-hacky enumerate all subsets of {1,...,5}
+    // Hacky-hacky enumerate all subsets of {1,...,5} ...
     for (int i = 1; i < 32; ++i) {
         for (int j = 1; j < 32; ++j) {
             auto J = VertexSet{};
@@ -39,6 +39,7 @@ int main() {
                 if (j & (1 << k)) L.insert(k + 1);
             }
 
+            // ... and filter the non-disjoint pairs.
             vector<Vertex> result{};
             set_intersection(J.begin(), J.end(), L.begin(), L.end(), back_inserter(result));
             if (!result.empty()) continue;
@@ -46,7 +47,8 @@ int main() {
             auto K = dSeparation(D, J, L);
             
             if (K.empty()) continue;
-            prettyPrint(cout, J, dSeparation(D, J, L), L);
+            // prettyPrint(cout, J, dSeparation(D, J, L), L);
+            compactPrettyPrint(cout, J, dSeparation(D, J, L), L);
         }
     }
 

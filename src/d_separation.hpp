@@ -25,4 +25,14 @@ inline void prettyPrint(
     out << "J={" << J << "} is d-separated from K={" << K << "} by L={" << L << "}" << std::endl;
 }
 
+inline void compactPrettyPrint(
+    std::ostream &out,
+    const VertexSet& J,
+    const VertexSet& K,
+    const VertexSet& L
+) {
+    out << "{" << J << "} _||_ {" << K << "} | {" << L << "}" << std::endl;
+}
+
+
 #endif
