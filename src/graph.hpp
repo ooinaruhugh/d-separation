@@ -83,7 +83,8 @@ inline void printVertexSet(const VertexSet V) {
 
 inline std::ostream& operator<<(std::ostream &out, const VertexSet &V) {
     for (auto v : V) std::cout << v << ",";
-    return out << "\b \b";
+    if (V.size() > 0) out << "\b \b";
+    return out;
 }
 
 inline std::ostream& operator<<(std::ostream &out, const Edge &e) {

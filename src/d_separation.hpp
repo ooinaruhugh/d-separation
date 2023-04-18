@@ -2,16 +2,27 @@
 #define D_SEPARATION_HPP
 #include "graph.hpp"
 
+#include <iostream>
+
 std::set<Vertex> restrictedBFS(
-    Digraph D,
-    std::set<std::pair<Edge, Edge>> illegal_edges,
-    std::set<Vertex> J
+    const Digraph &D,
+    const std::set<std::pair<Edge, Edge>> &illegal_edges,
+    const std::set<Vertex> &J
 );
 
 std::set<Vertex> dSeparation (
-    Digraph D,
-    std::set<Vertex> J,
-    std::set<Vertex> L
+    const Digraph &D,
+    const std::set<Vertex> &J,
+    const std::set<Vertex> &L
 );
+
+inline void prettyPrint(
+    std::ostream &out,
+    const VertexSet& J,
+    const VertexSet& K,
+    const VertexSet& L
+) {
+    out << "J={" << J << "} is d-separated from K={" << K << "} by L={" << L << "}" << std::endl;
+}
 
 #endif

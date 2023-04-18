@@ -20,7 +20,10 @@ int main() {
 
     // printVertexSet(restrictedBFS(D, set<pair<Edge, Edge>>(), set<Vertex>{1}));
     // cout << "----" << endl;
-    printVertexSet(dSeparation(D, {1}, {2,3}));
+
+    auto J = VertexSet{1};
+    auto L = VertexSet{4};
+    prettyPrint(cout, J, dSeparation(D, J, L), L);
 
     return 0;
 }

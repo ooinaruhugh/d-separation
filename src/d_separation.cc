@@ -11,9 +11,9 @@
 using namespace std;
 
 set<Vertex> restrictedBFS(
-    Digraph D,
-    set<pair<Edge, Edge>> illegal_edges,
-    set<Vertex> J
+    const Digraph &D,
+    const set<pair<Edge, Edge>> &illegal_edges,
+    const set<Vertex> &J
 ) {
     set<Vertex> R;
     set<Edge> frontier, next_frontier, visited;
@@ -32,7 +32,7 @@ set<Vertex> restrictedBFS(
     }
 
     while (true) {
-        // 3. Find all unlabeled edges adjacent to at least one edge such that (u->v,v->w) is legal...
+        // 3. Find all unlabeled edges adjacent to at least one edge such that (u->v, v->w) is legal...
         for (auto [s, t] : frontier) {
             R.emplace(t);
 
@@ -40,7 +40,7 @@ set<Vertex> restrictedBFS(
             for (Edge e : D.outgoingEdges(t)) {
                 // **unlabeled**
                 if (visited.contains(e)) continue;
-                // ... such that ... *legal pair*...
+                // ... such that (s->t, e = t->...) is a *legal pair*.
                 if (!illegal_edges.contains(make_pair(Edge{s,t}, e)))
                     next_frontier.emplace(e);
             }
@@ -59,24 +59,24 @@ set<Vertex> restrictedBFS(
 
 // Calculates a maximal set K that is d-separated from J by L.
 set<Vertex> dSeparation (
-    Digraph D,
-    set<Vertex> J,
-    set<Vertex> L
+    const Digraph &D,
+    const set<Vertex> &J,
+    const set<Vertex> &L
 ) {    
     // 1. Construct the table `descendent`.
     auto inLists = D.inLists();
     set<Vertex> descendent;
-    for (auto l : L) {
-        descendent.emplace(l);
+    for (auto v : L) {
+        descendent.emplace(v);
 
-        auto& ancestors = inLists[l];
+        auto& ancestors = inLists[v];
         descendent.insert(ancestors.begin(), ancestors.end());
     }
 
     // 2. Construct the directed graph D' adding the flipped edges.
     auto D_prime{D};
     for (auto s : D.V()) {
-        for (auto t : D.E[s])
+        for (auto t : D.E.at(s))
             D_prime.addEdge(t,s);
     }
 
@@ -89,15 +89,15 @@ set<Vertex> dSeparation (
     }
 
     for (auto s : D.V()) {
-        for (auto t : D.E[s]) {
-            // Non-colliders
-            for (auto u : D.E[t]) {
+        for (auto t : D.E.at(s)) {
+            // Non-colliders (case: s -> t -> u, if t is `descendent`, this is illegal)
+            for (auto u : D.E.at(t)) {
                 if (descendent.contains(t)) {
                     illegal_edges.emplace(Edge{s,t}, Edge{t,u});
                     // cout << "Add " << s << " -> " << t << " -> " << u << endl;
                 }
             }
-            // Colliders
+            // Colliders (case: s -> t <- u, if t is *not* `descendent`, this is illegal)
             for (auto u : inLists[t]) {
                 if (!descendent.contains(t)) {
                     illegal_edges.emplace(Edge{s,t}, Edge{t,u});
