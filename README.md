@@ -17,7 +17,8 @@ cd ./build
 cmake ..
 cmake --build .
 ```
-should do the job. Besides that, there's also a classical GNU Makefile. To see what targets are available, check `TARGETS` in the [Makefile](Makefile).
+should do the job. Besides that, there's also a classical GNU Makefile, so just running `make` works and gives you executables for each target. 
+To see what targets are available, check `TARGETS` in the [Makefile](Makefile).
 
 ## Literature
 Dan Geiger and Tom S. Verma and Judea Pearl. *d-Separation: From Theorems to Algorithms* In Proceedings of the Fifth Conference on Uncertainty in Artificial Intelligence (UAI1989), p. 139-148, 1990.
