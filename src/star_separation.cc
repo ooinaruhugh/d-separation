@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "graph.hpp"
+#include "utility.hpp"
 
 using namespace std;
 
@@ -36,6 +37,13 @@ set<Vertex> starReachability(
         R.emplace(-j);
     }
 
+    // 2. Construct the directed graph D' adding the flipped edges.
+    // (Move this step from the other algorithm, so this algorithm knows the original D)
+    for (auto s : D.V()) {
+        for (auto t : D.E.at(s))
+            D_prime.addEdge(t,s);
+    }
+
     while (true) {
         // 3. Find all unlabeled edges adjacent to at least one edge such that (u->v, v->w) is legal...
         for (auto [e, passedACollider] : frontier) {
@@ -47,7 +55,7 @@ set<Vertex> starReachability(
             bool s_to_t = s > 0 ? D.E.at(s).contains(t) : true;
 
             // *Find* all...
-            for (Edge f : D.outgoingEdges(t)) {
+            for (Edge f : D_prime.outgoingEdges(t)) {
                 bool t_is_collider = s_to_t && D.E.at(f.second).contains(t);
 
                 if (t_is_collider && passedACollider) continue;
@@ -85,14 +93,7 @@ set<Vertex> starSeparation (
 
         auto& ancestors = inLists[v];
         descendent.insert(ancestors.begin(), ancestors.end());
-    }
-
-    // 2. Construct the directed graph D' adding the flipped edges.
-    auto D_prime{D};
-    for (auto s : D.V()) {
-        for (auto t : D.E.at(s))
-            D_prime.addEdge(t,s);
-    }
+    }   
 
     // 3a. Construct the illegal list of edges.
     set<pair<Edge, Edge>> illegal_edges;
@@ -141,7 +142,7 @@ set<Vertex> starSeparation (
     }
 
     // 3. Using algorithm 1, ...
-    auto K_prime = starReachability(D_prime, illegal_edges, J);
+    auto K_prime = starReachability(D, illegal_edges, J);
 
     // 4.
     auto K = D.V();
@@ -154,6 +155,6 @@ set<Vertex> starSeparation (
     for (auto v : L) {
         K.erase(v);
     }
-
+    
     return K;
 }
