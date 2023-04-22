@@ -3,10 +3,12 @@ CXXFLAGS=-Isrc -std=c++20
 INCLUDES=src
 INTERFACE_HEADERS=src/d_separation.hpp src/graph.hpp
 
-TARGETS=demo01 test_cassiopeia test_diamond
+TARGETS=demo01 test_cassiopeia test_diamond demo_star
 
-ALGORITHM_MODULE=src/d_separation
-# ALGORITHM_MODULE=src/bayes_ball
+DSEP_ALGORITHM_MODULE=src/d_separation
+# DSEP_ALGORITHM_MODULE=src/bayes_ball
+
+STARSEP_ALGORITHM_MODULE=src/star_separation
 
 DEBUG ?= 1
 ifeq ($(DEBUG), 1)
@@ -21,17 +23,19 @@ all: $(TARGETS)
 
 LINK_COMMAND=$(CXX) -o $@ $^ $(CXXFLAGS)
 
-demo01: plain.o $(ALGORITHM_MODULE).o
+demo_star: demo_star.o $(STARSEP_ALGORITHM_MODULE).o
 	$(LINK_COMMAND)
-test_cassiopeia: tests/test_driver.o tests/cassiopeia.o $(ALGORITHM_MODULE).o
+demo01: plain.o $(DSEP_ALGORITHM_MODULE).o
 	$(LINK_COMMAND)
-test_diamond: tests/test_driver.o tests/diamond.o $(ALGORITHM_MODULE).o
+test_cassiopeia: tests/test_driver.o tests/cassiopeia.o $(DSEP_ALGORITHM_MODULE).o
+	$(LINK_COMMAND)
+test_diamond: tests/test_driver.o tests/diamond.o $(DSEP_ALGORITHM_MODULE).o
 	$(LINK_COMMAND)
 	
 %.o: %.cc $(INTERFACE_HEADERS)
 	$(CXX) $(CXXFLAGS) -c -o $@ $< 
 
 clean: 
-	$(RM) *.o **/*.o $(TARGETS)
+	@$(RM) *.o **/*.o $(TARGETS)
 
 .phony: all clean
