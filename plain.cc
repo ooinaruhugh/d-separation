@@ -14,7 +14,9 @@
 #include <iostream>
 
 #include "graph.hpp"
+#include "utility.hpp"
 #include "d_separation.hpp"
+#include "star_separation.hpp"
 
 using namespace std;
 
@@ -29,6 +31,7 @@ int main() {
     auto L = VertexSet{4,5};
 
     printIndependenceStatement(cout, J, dSeparation(D, J, L), L);
+    printIndependenceStatement(cout, J, starSeparation(D, J, L), L);
 
     return 0;
 }

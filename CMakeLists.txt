@@ -16,7 +16,13 @@ target_compile_features(star_separation PRIVATE cxx_std_20)
 
 add_executable(demo01 plain.cc)
 target_link_libraries(demo01 d_separation)
+target_link_libraries(demo01 star_separation)
 target_compile_features(demo01 PRIVATE cxx_std_20)
+
+add_executable(demo_enumerate demo_enumerate.cc)
+target_link_libraries(demo_enumerate d_separation)
+target_link_libraries(demo_enumerate star_separation)
+target_compile_features(demo_enumerate PRIVATE cxx_std_20)
 
 add_executable(demo_star demo_star.cc)
 target_link_libraries(demo_star star_separation)

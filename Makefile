@@ -25,7 +25,9 @@ LINK_COMMAND=$(CXX) -o $@ $^ $(CXXFLAGS)
 
 demo_star: demo_star.o $(STARSEP_ALGORITHM_MODULE).o
 	$(LINK_COMMAND)
-demo01: plain.o $(DSEP_ALGORITHM_MODULE).o
+demo01: plain.o $(DSEP_ALGORITHM_MODULE).o $(STARSEP_ALGORITHM_MODULE).o
+	$(LINK_COMMAND)
+demo_enumerate: demo_enumerate.o $(DSEP_ALGORITHM_MODULE).o $(STARSEP_ALGORITHM_MODULE).o
 	$(LINK_COMMAND)
 test_cassiopeia: tests/test_driver.o tests/cassiopeia.o $(DSEP_ALGORITHM_MODULE).o
 	$(LINK_COMMAND)
