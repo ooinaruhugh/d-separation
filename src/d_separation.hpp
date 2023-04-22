@@ -28,5 +28,11 @@ inline void compactPrettyPrint(
     out << "{{" << J << "}, {" << K << "}, {" << L << "}}" << std::endl;
 }
 
+void (*printIndependenceStatement)(
+    std::ostream &, 
+    const VertexSet&,
+    const VertexSet&,
+    const VertexSet&
+) = prettyPrint;
 
 #endif

@@ -90,14 +90,12 @@ set<Vertex> dSeparation (
 
     for (auto s : D.V()) {
         for (auto t : D.E.at(s)) {
-            // Non-colliders (case: s -> t -> u, if t is `descendent`, this is illegal)
+            // Non-colliders (case: s -> t -> u, if t is in L, this is illegal)
             // cerr << Edge{s,t} << endl;
             for (auto u : D.E.at(t)) {
-                if (descendent.contains(t)) {
+                if (L.contains(t)) {
                     illegal_edges.emplace(Edge{s,t}, Edge{t,u});
                     // cerr << "Add " << s << " -> " << t << " -> " << u << endl;
-                } else {
-                    // cerr << "Don't add " << s << " -> " << t << " -> " << u << endl;
                 }
             }
             // Colliders (case: s -> t <- u, if t is *not* `descendent`, this is illegal)
@@ -113,16 +111,14 @@ set<Vertex> dSeparation (
             // cerr << Edge{t,s} << endl;
             // Non-colliders (case: s <- t -> u, if t is `descendent`, this is illegal)
             for (auto u : D.E.at(t)) {
-                if (descendent.contains(t)) {
+                if (L.contains(t)) {
                     illegal_edges.emplace(Edge{s,t}, Edge{t,u});
                     // cerr << "Add " << s << " -> " << t << " -> " << u << endl;
-                } else {
-                    // cerr << "Don't add " << s << " -> " << t << " -> " << u << endl;
                 }
             }
             // Non-collider (case: s <- t <- u, if t is `descendent`, this is illegal)
             for (auto u : inLists[t]) {
-                if (descendent.contains(t)) {
+                if (L.contains(t)) {
                     illegal_edges.emplace(Edge{s,t}, Edge{t,u});
                     // cerr << "Add " << s << " -> " << t << " <- " << u << endl;
                 }
