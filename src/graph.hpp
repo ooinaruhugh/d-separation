@@ -58,6 +58,10 @@ struct Digraph {
         return output;
     }
 
+    bool isEdge(Vertex s, Vertex t) const {
+        return E.contains(s) ? E.at(s).contains(t) : false;
+    }
+
     void printAdjacencyList() const {
         for (auto s :V()) {
             std::cout << s << " -> ";
