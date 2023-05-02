@@ -11,7 +11,7 @@ using Vertex = int;
 using VertexSet = std::set<Vertex>;
 using Edge = std::pair<Vertex,Vertex>;
 using EdgeSet = std::set<Edge>;
-using AdjacencyList = std::map<Vertex,std::set<Vertex>>;
+using AdjacencyList = std::map<Vertex,VertexSet>;
 
 struct Digraph {
     AdjacencyList E;
