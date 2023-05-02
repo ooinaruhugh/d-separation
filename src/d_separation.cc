@@ -10,13 +10,13 @@
 
 using namespace std;
 
-set<Vertex> restrictedBFS(
+VertexSet restrictedBFS(
     const Digraph &D,
     const set<pair<Edge, Edge>> &illegal_edges,
-    const set<Vertex> &J
+    const VertexSet &J
 ) {
-    set<Vertex> R;
-    set<Edge> frontier, next_frontier, visited;
+    VertexSet R;
+    EdgeSet frontier, next_frontier, visited;
 
     auto D_prime{D};
 
@@ -58,14 +58,14 @@ set<Vertex> restrictedBFS(
 }
 
 // Calculates a maximal set K that is d-separated from J by L.
-set<Vertex> dSeparation (
+extern "C" VertexSet dSeparation (
     const Digraph &D,
-    const set<Vertex> &J,
-    const set<Vertex> &L
+    const VertexSet &J,
+    const VertexSet &L
 ) {    
     // 1. Construct the table `descendent`.
     auto inLists = D.inLists();
-    set<Vertex> descendent;
+    VertexSet descendent;
     for (auto v : L) {
         descendent.emplace(v);
 

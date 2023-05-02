@@ -53,8 +53,8 @@ struct Digraph {
         return output;
     }
 
-    std::map<Vertex, VertexSet> inLists() const {
-        std::map<Vertex, VertexSet> output;
+    AdjacencyList inLists() const {
+        AdjacencyList output;
         for (auto v : V()) output[v];
 
         for (auto s : V()) {

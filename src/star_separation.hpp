@@ -2,10 +2,10 @@
 #define STAR_SEPARATION_HPP
 #include "graph.hpp"
 
-std::set<Vertex> starSeparation (
+extern "C" VertexSet starSeparation (
     const Digraph &D,
-    const std::set<Vertex> &J,
-    const std::set<Vertex> &L
+    const VertexSet &J,
+    const VertexSet &L
 );
 
 #endif

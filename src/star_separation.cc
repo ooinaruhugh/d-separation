@@ -13,10 +13,10 @@ using namespace std;
 
 using TaggedEdge = pair<Edge, bool>;
 
-set<Vertex> starReachability(
+VertexSet starReachability(
     const Digraph &D,
     const set<pair<Edge, Edge>> &illegal_edges,
-    const set<Vertex> &J
+    const VertexSet &J
 ) {
     set<Vertex> R;
     set<TaggedEdge> frontier, next_frontier, visited;
@@ -102,10 +102,10 @@ set<Vertex> starReachability(
     }
 }
 
-set<Vertex> starSeparation (
+extern "C" VertexSet starSeparation (
     const Digraph &D,
-    const set<Vertex> &J,
-    const set<Vertex> &L
+    const VertexSet &J,
+    const VertexSet &L
 ) {
     // 1. Construct the table `descendent`.
     auto inLists = D.inLists();
