@@ -25,8 +25,10 @@ struct Digraph {
     }
 
     VertexSet V() const {
-        // auto kv = std::views::keys(E);
-        // return std::set<Vertex>{ kv.begin(), kv.end() };
+#ifdef __cpp_lib_ranges
+        auto kv = std::views::keys(E);
+        return std::set<Vertex>{ kv.begin(), kv.end() };
+#else
         VertexSet V; 
 
         for (auto const& [key, val] : E) {
@@ -34,6 +36,7 @@ struct Digraph {
         }
 
         return V;
+#endif
     }
 
     void addVertex(Vertex v) {
@@ -107,6 +110,5 @@ inline void printEdgeSet(const EdgeSet E) {
         std::cout << s << " -> " << t << ", ";
     std::cout << std::endl;
 }
-
 
 #endif
