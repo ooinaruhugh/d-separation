@@ -2,7 +2,7 @@
 #define D_SEPARATION_HPP
 #include "graph.hpp"
 
-extern "C" VertexSet dSeparation (
+extern VertexSet dSeparation (
     const Digraph &D,
     const VertexSet &J,
     const VertexSet &L

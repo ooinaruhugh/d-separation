@@ -102,7 +102,7 @@ VertexSet starReachability(
     }
 }
 
-extern "C" VertexSet starSeparation (
+VertexSet starSeparation (
     const Digraph &D,
     const VertexSet &J,
     const VertexSet &L

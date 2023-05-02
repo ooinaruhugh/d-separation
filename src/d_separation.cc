@@ -58,7 +58,7 @@ VertexSet restrictedBFS(
 }
 
 // Calculates a maximal set K that is d-separated from J by L.
-extern "C" VertexSet dSeparation (
+VertexSet dSeparation (
     const Digraph &D,
     const VertexSet &J,
     const VertexSet &L

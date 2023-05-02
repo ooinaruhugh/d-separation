@@ -2,7 +2,7 @@
 #define STAR_SEPARATION_HPP
 #include "graph.hpp"
 
-extern "C" VertexSet starSeparation (
+extern VertexSet starSeparation (
     const Digraph &D,
     const VertexSet &J,
     const VertexSet &L
