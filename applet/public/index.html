@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <title>d-Separation Demo</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="appContainer"></div>
+    <script>
+      var Module = {
+        onRuntimeInitialized: function() {
+          const D = new Module.Digraph(5);
+          D.addEdge(1,4);
+          D.addEdge(2,4);
+          D.addEdge(2,5);
+          D.addEdge(3,5);
+
+          D.printAdjacencyList();
+
+          const J = new Module.VertexSet();
+          Module.addToSet(J, 1);
+
+          const L = new Module.VertexSet();
+          Module.addToSet(L, 4);
+          Module.addToSet(L, 5);
+
+          let _K = Module.starSeparation(D, J, L);
+          let K = Module.viewFromVertexSet(_K);
+          _K.delete();
+          console.log([...K]);
+        }
+      };
+    </script>
+    <script src="markov.js"></script>
+  </body>
+</html>
