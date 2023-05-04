@@ -20,11 +20,11 @@ export default class State {
     
     _nodes: Array<Node> = [];
 
-    private _theGraph : Module.Digraph;
-    public get theGraph() : Module.Digraph {
+    private _theGraph : Module.Digraph | null;
+    public get theGraph() : Module.Digraph | null {
         return this._theGraph;
     }
-    public set theGraph(D : Module.Digraph) {
+    public set theGraph(D : Module.Digraph | null) {
         this._theGraph = D;
     }
     
@@ -46,18 +46,26 @@ export default class State {
     constructor(originX, originY) {
         this._originX = originX;
         this._originY = originY;
+
+        this._theGraph = null;
     }
 
-    // addNode (x, y) {
-    //     this._nodes.push(new Node(this._nodes.length, x, y))
-    // }
+    addNode (x, y) {
+        if (this._theGraph !== null) {
+            const id = this._theGraph.Vcount();
+
+            this._theGraph.addVertex(id);
+        }
+
+        // this._nodes.push(new Node(this._nodes.length, x, y))
+    }
 
     // addArrow(s: Node, t: Node) {
     //     s.addNeighbor(t);
     // }
 
     get nodes() {
-        return this._nodes;
+        return this._theGraph?.V() ?? [];
     }
 
     get editMode() {

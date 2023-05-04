@@ -41,12 +41,20 @@ test_diamond: tests/test_driver.o tests/diamond.o $(DSEP_ALGORITHM_MODULE).o
 WASM_ARTIFACTS=markov.mjs markov.wasm
 WASM_OUTPUT_DIR=applet/src/wasm
 
-EMCCFLAGS=-Os -s USE_ES6_IMPORT_META=0 -s ENVIRONMENT=web -s MODULARIZE=1 -s EXPORT_ES6=1 
-wasm: $(addprefix $WASM_OUTPUT_DIR,$WASM_ARTIFACTS)
+EMCCFLAGS=-Os -g1 \
+	-s WASM=1 \
+	-s MALLOC=emmalloc \
+	-s ALLOW_MEMORY_GROWTH=1 \
+	-s EXPORT_ES6=1 \
+	-s MODULARIZE=1 \
+	-s ENVIRONMENT='web'\
+	-s EXPORTED_FUNCTIONS='["_free"]'
 
-$(addprefix $WASM_OUTPUT_DIR,$WASM_ARTIFACTS): src/wasm.cc $(DSEP_ALGORITHM_MODULE).cc $(STARSEP_ALGORITHM_MODULE).cc
-	emcc -lembind -o $(WASM_OUTPUT_DIR)/markov.mjs $^ $(CXXFLAGS) $(EMCCFLAGS)
+wasm: $(WASM_OUTPUT_DIR)/markov.mjs applet/public/markov.wasm
 
+$(WASM_OUTPUT_DIR)/markov.mjs applet/public/markov.wasm: src/wasm.cc $(DSEP_ALGORITHM_MODULE).cc $(STARSEP_ALGORITHM_MODULE).cc
+	emcc --bind -o $(WASM_OUTPUT_DIR)/markov.mjs $^ $(CXXFLAGS) $(EMCCFLAGS) -s EXPORT_NAME='loadMarkovModule'
+	mv $(WASM_OUTPUT_DIR)/markov.wasm applet/public/markov.wasm
 clean: 
 	@$(RM) *.o **/*.o $(TARGETS)
 

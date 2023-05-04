@@ -15,12 +15,12 @@ if (DEFINED EMSCRIPTEN)
 
     target_compile_features(markov PRIVATE cxx_std_20)
 
-    set(CMAKE_EXECUTABLE_SUFFIX ".wasm")
+    # set(CMAKE_EXECUTABLE_SUFFIX ".wasm")
     
     target_link_libraries(markov embind)
 
 	set_target_properties(markov PROPERTIES COMPILE_FLAGS "-Os -s SIDE_MODULE=0")
-	set_target_properties(markov PROPERTIES LINK_FLAGS    "-Os -s WASM=1 -s SIDE_MODULE=0 -s STANDALONE_WASM -s ENVIRONMENT=web -s MODULARIZE=1 -s EXPORT_ES6=1 --bind --no-entry")
+	set_target_properties(markov PROPERTIES LINK_FLAGS    "-Os -s WASM=1 -s SIDE_MODULE=0 -s ENVIRONMENT=web --bind --no-entry")
 else()
     add_library(d_separation STATIC src/d_separation.cc)
     target_compile_features(d_separation PRIVATE cxx_std_20)

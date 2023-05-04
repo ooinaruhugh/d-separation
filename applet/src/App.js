@@ -1,7 +1,6 @@
 import './App.css';
 
 import loadMarkovModule from './wasm/markov.mjs';
-import './wasm/markov.wasm';
 
 import State from './mvvc/State.ts';
 import CheckedValues from './mvvc/StateReactBindings.ts';
@@ -31,6 +30,11 @@ import {
   Cursor24Regular
 } from '@fluentui/react-icons';
 
+const MarkovPromise = loadMarkovModule({
+	noInitialRun: true,
+	noExitRuntime: true
+});
+
 function redraw(canvas, ctx, state) {
   ctx.clearRect(0,0, canvas.width, canvas.height)
 
@@ -54,6 +58,8 @@ function redraw(canvas, ctx, state) {
 function App() {
   const [uiState, ] = React.useState(new State());
   const checkedValues =  new CheckedValues(uiState);
+  
+  console.log(uiState);
 
   const [_isMousedown, _setIsMousedown] = React.useState(false);
   const isMousedown = React.useRef(_isMousedown);
@@ -70,10 +76,6 @@ function App() {
   };
 
   React.useEffect(() => {
-    loadMarkovModule().then(() => {
-      console.log("Test");
-    });
-
     var c = document.getElementById("viewport");
     var ctx = c.getContext("2d");
 
@@ -90,6 +92,20 @@ function App() {
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Leave empty so it only gets called once...
+
+  MarkovPromise.then((Markov) => {
+    const D = new Markov.Digraph(0);
+
+    uiState.theGraph = D;
+
+    uiState.addNode(3);
+    uiState.addNode(5);
+
+    let V = uiState.nodes
+    console.log(V);
+
+    console.log(Markov);
+  });
 
   return (
     <div className="App">
