@@ -4934,7 +4934,7 @@ var _malloc = function() {
  return (_malloc = Module["asm"]["R"]).apply(null, arguments);
 };
 
-var _free = function() {
+var _free = Module["free"] = function() {
  return (_free = Module["asm"]["S"]).apply(null, arguments);
 };
 
