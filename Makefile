@@ -37,7 +37,17 @@ test_diamond: tests/test_driver.o tests/diamond.o $(DSEP_ALGORITHM_MODULE).o
 %.o: %.cc $(INTERFACE_HEADERS)
 	$(CXX) $(CXXFLAGS) -c -o $@ $< 
 
+###### All the stuff for the web app
+WASM_ARTIFACTS=markov.mjs markov.wasm
+WASM_OUTPUT_DIR=applet/src/wasm
+
+EMCCFLAGS=-Os -s USE_ES6_IMPORT_META=0 -s ENVIRONMENT=web -s MODULARIZE=1 -s EXPORT_ES6=1 
+wasm: $(addprefix $WASM_OUTPUT_DIR,$WASM_ARTIFACTS)
+
+$(addprefix $WASM_OUTPUT_DIR,$WASM_ARTIFACTS): src/wasm.cc $(DSEP_ALGORITHM_MODULE).cc $(STARSEP_ALGORITHM_MODULE).cc
+	emcc -lembind -o $(WASM_OUTPUT_DIR)/markov.mjs $^ $(CXXFLAGS) $(EMCCFLAGS)
+
 clean: 
 	@$(RM) *.o **/*.o $(TARGETS)
 
-.phony: all clean
+.phony: all clean wasm

@@ -21,15 +21,13 @@
           D.printAdjacencyList();
 
           const J = new Module.VertexSet();
-          Module.addToSet(J, 1);
+          J.add(1);
 
           const L = new Module.VertexSet();
-          Module.addToSet(L, 4);
-          Module.addToSet(L, 5);
+          L.add(4);
+          L.add(5);
 
-          let _K = Module.starSeparation(D, J, L);
-          let K = Module.viewFromVertexSet(_K);
-          _K.delete();
+          let K = Module.starSeparation(D, J, L);
           console.log([...K]);
         }
       };

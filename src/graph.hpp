@@ -43,8 +43,29 @@ struct Digraph {
         E.try_emplace(v);
     }
 
+    void removeVertex(Vertex v) {
+        E.erase(v);
+    }
+
     void addEdge(Vertex s, Vertex t) {
-        E[s].insert(t);
+        try {
+            if (!E.contains(s)) throw s;
+            if (!E.contains(t)) throw t;
+
+            E.at(s).insert(t);
+        } catch (std::out_of_range e) {
+            std::cerr << "Vertex " << s << " does not exist." << std::endl;
+        } catch (Vertex v) {
+            std::cerr << "Vertex " << v << " does not exist" << std::endl;
+        }
+    }
+
+    void removeEdge(Vertex s, Vertex t) {
+        try {
+            E[s].erase(t);
+        } catch (std::out_of_range e) {
+            std::cerr << "Vertex " << s << " does not exist." << std::endl;
+        }
     }
 
     EdgeSet outgoingEdges(Vertex v) const {

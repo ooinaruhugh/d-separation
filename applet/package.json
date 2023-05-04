@@ -9,6 +9,8 @@
     "react-scripts": "5.0.1"
   },
   "scripts": {
+    "build:wasm": "make -C .. wasm",
+    "prestart": "npm run build:wasm",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject"
