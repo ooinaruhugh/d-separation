@@ -21,3 +21,6 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+src/wasm/markov.mjs
+src/wasm/markov.wasm

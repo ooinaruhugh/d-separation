@@ -19,6 +19,9 @@
     "extends": [
       "react-app",
       "react-app/jest"
+    ],
+    "ignorePatterns": [
+      "src/wasm/markov.mjs"
     ]
   },
   "browserslist": {
@@ -32,5 +35,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/emscripten": "^1.39.6",
+    "webpack": "^5.82.0"
   }
 }

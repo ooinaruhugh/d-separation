@@ -9,6 +9,11 @@
 
 using namespace emscripten;
 
+EMSCRIPTEN_KEEPALIVE
+int testMe() {
+    return 1;
+}
+
 template <typename T> EMSCRIPTEN_KEEPALIVE
 void addToSet(std::set<T>& V, T v) {
     V.emplace(v);
@@ -37,10 +42,40 @@ val viewFromSet(std::set<T> S) {
     ));
 }
 
+template <typename T> EMSCRIPTEN_KEEPALIVE
+val viewFromSetRef(const std::set<T>& S) {
+#ifdef __cpp_lib_ranges
+    auto buffer = std::ranges::ref_view(S);
+#else
+    T* buffer = new T[S.size()];
+
+    int i = 0;
+    for (auto x : S) {
+        buffer[i++] = x;
+    }
+#endif
+    return val(typed_memory_view(
+        S.size(),
+        buffer
+    ));
+}
+
+EMSCRIPTEN_KEEPALIVE
+size_t Vcount(const Digraph& D) {
+    return D.E.size();
+}
+
+EMSCRIPTEN_KEEPALIVE
+val _V(const Digraph& D) {
+    return viewFromSetRef(D.V());
+}
+
 EMSCRIPTEN_BINDINGS(graph) {
     class_<Digraph>("Digraph")
         .constructor<int>()
-        .function("V", &Digraph::V)
+        .function("V", _V)
+        .property("E", &Digraph::E)
+        .function("Vcount", Vcount)
         .function("addVertex", &Digraph::addVertex)
         .function("addEdge", &Digraph::addEdge)
         .function("removeVertex", &Digraph::removeVertex)
@@ -62,12 +97,25 @@ EMSCRIPTEN_BINDINGS(graph) {
         .function("clear", &VertexSet::clear)
         .function("add", addToSet<Vertex>)
         .function("remove", removeFromSet<Vertex>)
+        .function("toView", viewFromSetRef<Vertex>);
     ;
+
+    class_<EdgeSet>("EdgeSet")
+        .constructor<>()
+        .property("length", &EdgeSet::size)
+        .function("clear", &EdgeSet::clear)
+    ;
+    
+    register_vector<Vertex>("VertexVector");
+    register_vector<Edge>("EdgeVector");
+    register_map<Vertex, VertexSet>("AdjacencyList");
 
     function("viewFromVertexSet", viewFromSet<Vertex>);
 
     function("printVertexSet", printVertexSet);
     function("printEdgeSet", printEdgeSet);
+
+    function("testMe", testMe);
 }
 
 val _dSeparation (
