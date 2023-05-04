@@ -28,7 +28,7 @@ val viewFromSet(std::set<T> S) {
 
     int i = 0;
     for (auto x : S) {
-        buffer[i] = x;
+        buffer[i++] = x;
     }
 #endif
     return val(typed_memory_view(
