@@ -10,6 +10,7 @@ declare namespace Module {
 
         add(v: Vertex): void;
         remove(v: Vertex): void;
+        toView(): Array<number>;
     }
 
     export function viewFromVertexSet(S: VertexSet): Array<number>;

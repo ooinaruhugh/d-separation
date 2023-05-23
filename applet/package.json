@@ -2,11 +2,13 @@
   "name": "applet",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@fluentui/react-components": "^9.19.1",
+    "kd-tree-javascript": "^1.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1"
+    "react-scripts": "^5.0.1"
   },
   "scripts": {
     "build:wasm": "make -C .. wasm",
@@ -17,8 +19,7 @@
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "react-app"
     ],
     "ignorePatterns": [
       "src/wasm/markov.mjs"
@@ -38,6 +39,6 @@
   },
   "devDependencies": {
     "@types/emscripten": "^1.39.6",
-    "webpack": "^5.82.0"
+    "@types/kd-tree-javascript": "^1.0.1"
   }
 }

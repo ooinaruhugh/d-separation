@@ -1,9 +1,9 @@
-import State from './State';
+import {State} from './State';
 
 export default class CheckedValues {
   uiState: State;
 
-  constructor(uiState) {
+  constructor(uiState: State) {
     this.uiState = uiState;
   }
 

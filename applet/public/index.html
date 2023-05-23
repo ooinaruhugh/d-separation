@@ -9,7 +9,7 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="appContainer"></div>
-    <script>
+    <!-- <script>
       var Module = {
         onRuntimeInitialized: function() {
           const D = new Module.Digraph(5);
@@ -20,6 +20,13 @@
 
           D.printAdjacencyList();
 
+          console.log(D.V());
+          let E = D.E;
+          let keys = E.keys();
+          for (let i = 0; i < keys.size(); i++) {
+            console.log(Module.viewFromVertexSet(E.get(keys.get(i))));
+          }
+
           const J = new Module.VertexSet();
           J.add(1);
 
@@ -28,10 +35,10 @@
           L.add(5);
 
           let K = Module.starSeparation(D, J, L);
-          console.log([...K]);
+          console.log("K", [...K]);
         }
       };
     </script>
-    <script src="markov.js"></script>
+    <script src="markov.js"></script> -->
   </body>
 </html>
