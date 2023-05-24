@@ -31,13 +31,13 @@ import {
   ArrowCounterclockwise24Regular
 } from '@fluentui/react-icons';
 
-let uiState = new State();
-
-function redraw(canvas) {
+function redraw(canvas, uiState) {
   var ctx = canvas.getContext("2d");
   ctx.clearRect(0,0, canvas.width, canvas.height);
 
   for (let [node, record] of uiState.nodes) {
+    ctx.beginPath();
+
     if (record.tag === "J") {
       ctx.strokeStyle = "blue"
     } else if (record.tag === "K") {
@@ -48,27 +48,63 @@ function redraw(canvas) {
       ctx.strokeStyle = "black"
     }
 
-    ctx.strokeRect(
-      record.x + uiState.originX - 25, 
-      record.y + uiState.originY - 25, 
-      50, 50
+    // ctx.strokeRect(
+    //   record.x + uiState.originX - 25, 
+    //   record.y + uiState.originY - 25, 
+    //   50, 50
+    // );
+    
+    ctx.ellipse(
+      record.x + uiState.originX, 
+      record.y + uiState.originY, 
+      25, 25,
+      0, 
+      0, 2 * Math.PI
     );
+    ctx.stroke();
+
   }
   
   for (let e of uiState.edges) {
     let [s,t] = e.map(v => uiState._coords.get(v));
-    console.log(s,t);
 
     ctx.beginPath();
     ctx.strokeStyle = "black";
 
-    ctx.moveTo(s.x + uiState.originX, s.y + uiState.originY);
-    ctx.lineTo(t.x + uiState.originX, t.y + uiState.originY);
-    ctx.stroke();  
+    let dist = Math.sqrt(
+      Math.pow(s.x - t.x, 2) + Math.pow(s.y - t.y, 2)
+    );
+
+    const lineCoords = (a) => [
+      (1 - a) * s.x + a * t.x + uiState.originX,
+      (1 - a) * s.y + a * t.y + uiState.originY
+    ];
+
+    ctx.moveTo(...lineCoords(25/dist));
+    ctx.lineTo(...lineCoords(1 - (25/dist)));
+    ctx.stroke();
+
+    // Arrow heads
+    const normal = (() => {
+      const x = t.x - s.x;
+      const y = t.y - s.y;
+      return [5 * y/dist, -5 * x/dist]; 
+    })();
+    const arrowHeadEnd = lineCoords(1 - (45/dist));
+
+    ctx.beginPath();
+    ctx.moveTo(...lineCoords(1 - (25/dist)));
+    ctx.lineTo(normal[0] + arrowHeadEnd[0], normal[1] + arrowHeadEnd[1]);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(...lineCoords(1 - (25/dist)));
+    ctx.lineTo(-normal[0] + arrowHeadEnd[0], -normal[1] + arrowHeadEnd[1]);
+    ctx.stroke();
   }
 }
 
-function collisionDetection(e, bounding, callback) {
+function collisionDetection(e, bounding, uiState, callback) {
   const x = e.x - bounding.left - uiState.originX;
   const y = e.y - bounding.top - uiState.originY;
 
@@ -81,7 +117,7 @@ function collisionDetection(e, bounding, callback) {
 }
 
 function App() {
-  // const [uiState, ] = React.useState(new State());
+  const [uiState, ] = React.useState(new State());
   const checkedValues = new CheckedValues(uiState);
   
   // For panning
@@ -122,7 +158,7 @@ function App() {
         if (uiState.editMode === "selectSubsets") {
           let bounding = c.getBoundingClientRect();
 
-          collisionDetection(e, bounding, v => {
+          collisionDetection(e, bounding, uiState, v => {
             uiState.tagNode(
               v.id,
               v.tag === "L" ? "" : "L"
@@ -131,7 +167,7 @@ function App() {
             uiState.updateSeparationStatement();
           });
 
-          redraw(c);
+          redraw(c, uiState, uiState);
           e.preventDefault();
         }
         return uiState.editMode !== "selectSubsets"
@@ -141,7 +177,7 @@ function App() {
         let bounding = c.getBoundingClientRect();
         
         if (uiState.editMode === "addNode") {
-          const overlap = collisionDetection(e, bounding, () => true);
+          const overlap = collisionDetection(e, bounding, uiState, () => true);
 
           if (overlap !== true) {
             uiState.addNode(
@@ -153,25 +189,25 @@ function App() {
             ctx.canvas.height = c.clientHeight;
 
             uiState.updateSeparationStatement();
-            redraw(c);
+            redraw(c, uiState);
           }
         } else if (uiState.editMode === 'addEdge') {
           if (firstVertexForEdge.current === null) {
-            collisionDetection(e, bounding, v => setFirstVertexForEdge(v));
+            collisionDetection(e, bounding, uiState, v => setFirstVertexForEdge(v));
           } else {
-            collisionDetection(e, bounding, v => {
+            collisionDetection(e, bounding, uiState, v => {
               if (v.id !== firstVertexForEdge.current.id) {
                 uiState.addArrow(firstVertexForEdge.current.id, v.id);
 
                 setFirstVertexForEdge(null);
 
                 uiState.updateSeparationStatement();
-                redraw(c);
+                redraw(c, uiState);
               }
             });
           }
         } else if (uiState.editMode === "selectSubsets") {
-          collisionDetection(e, bounding, v => {
+          collisionDetection(e, bounding, uiState, v => {
             uiState.tagNode(
               v.id,
               v.tag === "J" ? "" : "J"
@@ -180,7 +216,7 @@ function App() {
             uiState.updateSeparationStatement();
           });
 
-          redraw(c);
+          redraw(c, uiState);
         }
       });
 
@@ -193,7 +229,7 @@ function App() {
           uiState.originX += e.movementX;
           uiState.originY += e.movementY;
   
-          redraw(c);
+          redraw(c, uiState);
         }
       });
   
@@ -203,7 +239,7 @@ function App() {
 
       document.getElementById("debugRefresh").addEventListener("click", () => {
         uiState.updateSeparationStatement();
-        redraw(c);
+        redraw(c, uiState);
       });
     });
 

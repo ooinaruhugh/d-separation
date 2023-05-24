@@ -75,10 +75,10 @@ export class State {
         this._coords = new Map<Vertex, TaggedVertex>();
         this._kdtree = new kdTree<TaggedVertex>(
             [],
-            // (a, b) => Math.sqrt(
-            //     Math.pow(a.x - b.x, 2) 
-            //     + Math.pow(a.y - b.y, 2)),
-            (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y)),
+            (a, b) => Math.sqrt(
+                Math.pow(a.x - b.x, 2) 
+                + Math.pow(a.y - b.y, 2)),
+            // (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y)),
             // (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y),
             ["x", "y"]
         );
