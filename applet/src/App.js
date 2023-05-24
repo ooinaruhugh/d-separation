@@ -5,7 +5,7 @@ import './App.css';
 import {MarkovPromise, State} from './mvvc/State.ts';
 import CheckedValues from './mvvc/StateReactBindings.ts';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
   Toolbar,
   ToolbarButton,
@@ -30,6 +30,7 @@ import {
   Cursor24Regular,
   ArrowCounterclockwise24Regular
 } from '@fluentui/react-icons';
+import { render } from 'react-dom';
 
 function redraw(canvas, uiState) {
   var ctx = canvas.getContext("2d");
@@ -105,8 +106,8 @@ function redraw(canvas, uiState) {
 }
 
 function collisionDetection(e, bounding, uiState, callback) {
-  const x = e.x - bounding.left - uiState.originX;
-  const y = e.y - bounding.top - uiState.originY;
+  const x = e.clientX - bounding.left - uiState.originX;
+  const y = e.clientY - bounding.top - uiState.originY;
 
   const nearestNeighbor = uiState.findNode(x, y);
   if (nearestNeighbor !== null) {
@@ -117,8 +118,9 @@ function collisionDetection(e, bounding, uiState, callback) {
 }
 
 function App() {
-  const [uiState, ] = React.useState(new State());
+  const [uiState, updateUiState] = React.useState(new State());
   const checkedValues = new CheckedValues(uiState);
+  const canvas = React.useRef();
   
   // For panning
   const [_isMousedown, _setIsMousedown] = React.useState(false);
@@ -140,108 +142,129 @@ function App() {
     e,
     {name, checkedItems}
   ) => {
-    uiState[name] = checkedItems[0];
+    updateUiState(currentState => {
+      let state = Object.assign(Object.create(currentState), currentState);
+      state[name] = checkedItems[0];
+
+      return state;
+    });
   };
 
-  React.useEffect(() => {
-    console.log(uiState);
-
-    var c = document.getElementById("viewport");
-    var ctx = c.getContext("2d");
-
-    uiState.originX = c.clientWidth / 2;
-    uiState.originY = c.clientHeight / 2;
-
+  const canvasClickHandler = e => {
     MarkovPromise.then(() => {
-      // For secondary-button click
-      c.addEventListener("contextmenu", (e) => {
-        if (uiState.editMode === "selectSubsets") {
-          let bounding = c.getBoundingClientRect();
+      var ctx = canvas.current.getContext("2d");
+      let bounding = canvas.current.getBoundingClientRect();
+          
+      if (uiState.editMode === "addNode") {
+        const overlap = collisionDetection(e, bounding, uiState, () => true);
 
-          collisionDetection(e, bounding, uiState, v => {
-            uiState.tagNode(
-              v.id,
-              v.tag === "L" ? "" : "L"
+        if (overlap !== true) {
+          updateUiState(currentState => {
+            let state = Object.assign(Object.create(currentState), currentState);
+
+            state.addNode(
+              e.clientX - bounding.left - uiState.originX, 
+              e.clientY - bounding.top - uiState.originY
             );
 
-            uiState.updateSeparationStatement();
-          });
-
-          redraw(c, uiState, uiState);
-          e.preventDefault();
+            state.updateSeparationStatement();
+            return state;
+          })
+            
+          ctx.canvas.width = canvas.current.clientWidth;
+          ctx.canvas.height = canvas.current.clientHeight;
         }
-        return uiState.editMode !== "selectSubsets"
-      });
-
-      c.addEventListener("click", (e) => {
-        let bounding = c.getBoundingClientRect();
-        
-        if (uiState.editMode === "addNode") {
-          const overlap = collisionDetection(e, bounding, uiState, () => true);
-
-          if (overlap !== true) {
-            uiState.addNode(
-              e.x - bounding.left - uiState.originX, 
-              e.y - bounding.top - uiState.originY
-            );
-              
-            ctx.canvas.width = c.clientWidth;
-            ctx.canvas.height = c.clientHeight;
-
-            uiState.updateSeparationStatement();
-            redraw(c, uiState);
-          }
-        } else if (uiState.editMode === 'addEdge') {
-          if (firstVertexForEdge.current === null) {
-            collisionDetection(e, bounding, uiState, v => setFirstVertexForEdge(v));
-          } else {
-            collisionDetection(e, bounding, uiState, v => {
-              if (v.id !== firstVertexForEdge.current.id) {
-                uiState.addArrow(firstVertexForEdge.current.id, v.id);
-
-                setFirstVertexForEdge(null);
-
-                uiState.updateSeparationStatement();
-                redraw(c, uiState);
-              }
-            });
-          }
-        } else if (uiState.editMode === "selectSubsets") {
+      } else if (uiState.editMode === 'addEdge') {
+        if (firstVertexForEdge.current === null) {
+          collisionDetection(e, bounding, uiState, v => setFirstVertexForEdge(v));
+        } else {
           collisionDetection(e, bounding, uiState, v => {
-            uiState.tagNode(
+            if (v.id !== firstVertexForEdge.current.id) {
+              updateUiState(currentState => {
+                let state = Object.assign(Object.create(currentState), currentState);
+      
+                state.addArrow(firstVertexForEdge.current.id, v.id);
+                state.updateSeparationStatement();
+                
+                setFirstVertexForEdge(null);
+                
+                return state;
+              });
+            }
+          });
+        }
+      } else if (uiState.editMode === "selectSubsets") {
+        collisionDetection(e, bounding, uiState, v => {
+          updateUiState(currentState => {
+            let state = Object.assign(Object.create(currentState), currentState);
+            state.tagNode(
               v.id,
               v.tag === "J" ? "" : "J"
             );
-            
-            uiState.updateSeparationStatement();
+          
+            state.updateSeparationStatement();
+            return state;
           });
-
-          redraw(c, uiState);
-        }
-      });
-
-      c.addEventListener('mousedown', (e) => {
-        setIsMousedown(true);
-      });
-  
-      c.addEventListener('mousemove', (e) => {
-        if (isMousedown.current && (uiState.editMode === "moveCanvas")) {
-          uiState.originX += e.movementX;
-          uiState.originY += e.movementY;
-  
-          redraw(c, uiState);
-        }
-      });
-  
-      c.addEventListener('mouseup', (e) => {
-        setIsMousedown(false);
-      });
-
-      document.getElementById("debugRefresh").addEventListener("click", () => {
-        uiState.updateSeparationStatement();
-        redraw(c, uiState);
-      });
+        });
+      }
     });
+  };
+
+  const panCanvas = e => {
+    if (isMousedown.current && (uiState.editMode === "moveCanvas")) {
+      updateUiState(currentState => {
+        let state = Object.assign(Object.create(currentState), currentState);
+        state.originX += e.movementX;
+        state.originY += e.movementY;
+
+        return state;
+      })
+    }
+  }
+
+  const canvasSecondaryClick = e => {
+    if (uiState.editMode === "selectSubsets") {
+      let bounding = canvas.current.getBoundingClientRect();
+
+      collisionDetection(e, bounding, uiState, v => {
+        updateUiState(currentState => {
+          let state = Object.assign(Object.create(currentState), currentState);
+
+          state.tagNode(
+            v.id,
+            v.tag === "L" ? "" : "L"
+          );
+
+          state.updateSeparationStatement();
+          return state;
+        });
+      });
+
+      e.preventDefault();
+    }
+    return uiState.editMode !== "selectSubsets"
+  };
+
+  const debugRefresh = e => {
+    console.log("Used the debug refresh", uiState);
+    updateUiState(currentState => {
+      let state = Object.assign(Object.create(currentState), currentState);
+      state.updateSeparationStatement();
+
+      return state;
+    })
+  }
+
+  useEffect(() => {
+    redraw(canvas.current, uiState);
+    console.log("Triggered redraw", uiState);
+  }, [uiState]);
+
+  React.useEffect(() => {
+    if (uiState.originX === undefined) 
+      uiState.originX = canvas.current.clientWidth / 2;
+    if (uiState.originY === undefined) 
+      uiState.originY = canvas.current.clientHeight / 2;
 
     // MarkovPromise.then((Module) => {
     //   const D = new Module.Digraph(5);
@@ -330,12 +353,19 @@ function App() {
           <ToolbarButton
             aria-label = "Refresh separation"
             id="debugRefresh"
+            onClick={debugRefresh}
             icon={<ArrowCounterclockwise24Regular/>}
           />
         </Toolbar>
       </FluentProvider>
       <canvas 
-        id="viewport"></canvas>
+        id="viewport"
+        ref={canvas}
+        onClick={canvasClickHandler}
+        onContextMenu={canvasSecondaryClick}
+        onMouseUp={e => setIsMousedown(false)}
+        onMouseMove={panCanvas}
+        onMouseDown={e => setIsMousedown(true)}></canvas>
     </div>
   );
 }
